@@ -84,48 +84,153 @@
 # #     session.close()
 # #     logging.info("Close the HHTP session")
 
+# import tweepy
+# import time
+# import os
+
+# os.system("cls")
+# # Ваши ключи API
+# bearer_token = "AAAAAAAAAAAAAAAAAAAAADSMtwEAAAAA7LdLaxVnZdL2uHR7jd%2F%2B7wYsYxs%3DTOoFNPqHcRSBmBa5TY6NmhJhFtW1PnyK9Zbza4W7uHxyDWutBi"
+
+# # Ваши ключи API
+
+# # Настройка клиента
+# client = tweepy.Client(bearer_token=bearer_token)
+
+# # Список имен пользователей (screen names)
+# usernames = ['JoeBiden', 'ElonMusk']  # Замените на нужные вам имена пользователей
+
+# def get_user_info(usernames):
+#     user_data = []
+#     for username in usernames:
+#         try:
+#             # Ограничения: не более 300 запросов за 15 минут
+#             if len(user_data) % 300 == 0 and len(user_data) > 0:
+#                 print("Достигнут лимит запросов. Ожидание 15 минут...")
+#                 time.sleep(15 * 60)  # Ожидание 15 минут
+            
+#             user = client.get_user(username=username)
+#             user_data.append({
+#                 'Username': username,
+#                 'Name': user.data.name,
+#                 'Followers': user.data.public_metrics['followers_count'],
+#                 'Following': user.data.public_metrics['following_count'],
+#                 'Tweets': user.data.public_metrics['tweet_count'],
+#                 'Account Creation Date': user.data.created_at
+#             })
+#         except tweepy.TweepyException as e:
+#             print(f"Failed to get data for {username}: {e}")
+#     return user_data
+
+# # Получение данных
+# user_info = get_user_info(usernames)
+
+# # Преобразование в DataFrame
+# import pandas as pd
+# df = pd.DataFrame(user_info)
+# print(df)
+
+
+
+# import tweepy
+# import json
+# import os
+# import datetime
+# import pandas as pd
+# import time
+# # import logging
+
+# os.system("cls")
+# print("Start progamm")
+# def get_tweets(username):
+#     tweets_data = []
+#     try:
+#         user = client.get_user(username=username)
+#         user_id = user.data.id
+#         query = f"from:{username} -is:retweet"
+#         since_date = datetime.datetime.now() - datetime.timedelta(days=365)
+#         end_time = since_date.isoformat("T") + "Z"
+
+#         paginator = tweepy.Paginator(client.search_all_tweets, query=query, tweet_fields=["created_at", "public_metrics"],
+#                                     start_time=end_time, max_results=100)
+        
+#         for tweet in paginator.flatten(limit=100):
+#             tweet_info = {
+#                 'id': tweet.id,
+#                 'created_at': tweet.created_at,
+#                 'full_text': tweet.text,
+#                 'retweet_count': tweet.public_metrics['retweet_count'],
+#                 'reply_count': tweet.public_metrics['reply_count'],
+#                 'like_count': tweet.public_metrics['like_count'],
+#                 'quote_count': tweet.public_metrics['quote_count']
+#             }
+#             tweets_data.append(tweet_info)
+#     except tweepy.TweepyException as e:
+#         print(f"An error {e}")
+#     return tweets_data
+
+# def get_bearer_from_json():
+#     bearer_list = []
+#     with open ("keys.json") as f:
+#         data = json.load(f)
+#         keys = list(data.keys())
+#     for k in keys:
+#         if "bearer" in k:
+#             bearer_list.append(data[k])
+#     return bearer_list
+
+# bearer_list = get_bearer_from_json()
+
+# for x in range(len(bearer_list)):
+#     bearer_token = bearer_list[x]
+#     print(f"Number of bearer_token: {x},\n value of bearer_token: {bearer_token}")
+#     client = tweepy.Client(bearer_token=bearer_token)
+#     username = "JoeBiden"
+#     tweets_data = get_tweets(username)
+#     df = pd.DataFrame(tweets_data)
+#     print(df)
+#     time.sleep(10)
+
+
 import tweepy
 import time
+import json
 import os
 
 os.system("cls")
-# Ваши ключи API
-bearer_token = "AAAAAAAAAAAAAAAAAAAAADSMtwEAAAAA7LdLaxVnZdL2uHR7jd%2F%2B7wYsYxs%3DTOoFNPqHcRSBmBa5TY6NmhJhFtW1PnyK9Zbza4W7uHxyDWutBi"
+print("~~~starting~~~")
 
-# Ваши ключи API
+def get_bearer_from_json():
+    bearer_list = []
+    with open("keys.json") as f:
+        data = json.load(f)
+        keys = list(data.keys())
+    for k in keys:
+        if "bearer" in k:
+            bearer_list.append(data[k])
+    return bearer_list
 
-# Настройка клиента
-client = tweepy.Client(bearer_token=bearer_token)
 
-# Список имен пользователей (screen names)
-usernames = ['JoeBiden', 'ElonMusk']  # Замените на нужные вам имена пользователей
-
-def get_user_info(usernames):
-    user_data = []
-    for username in usernames:
+def check_bearer_tokens(bearer_list):
+    valid_tokens = []
+    for bearer_token in bearer_list:
         try:
-            # Ограничения: не более 300 запросов за 15 минут
-            if len(user_data) % 300 == 0 and len(user_data) > 0:
-                print("Достигнут лимит запросов. Ожидание 15 минут...")
-                time.sleep(15 * 60)  # Ожидание 15 минут
-            
-            user = client.get_user(username=username)
-            user_data.append({
-                'Username': username,
-                'Name': user.data.name,
-                'Followers': user.data.public_metrics['followers_count'],
-                'Following': user.data.public_metrics['following_count'],
-                'Tweets': user.data.public_metrics['tweet_count'],
-                'Account Creation Date': user.data.created_at
-            })
+            client = tweepy.Client(bearer_token=bearer_token)
+            # Попробуем получить информацию о текущем пользователе
+            client.get_me()
+            print(f"Bearer token {bearer_token} is valid.")
+            valid_tokens.append(bearer_token)
         except tweepy.TweepyException as e:
-            print(f"Failed to get data for {username}: {e}")
-    return user_data
+            print(f"Bearer token {bearer_token} is invalid: {e}")
+        time.sleep(1)  # Задержка для предотвращения превышения лимита запросов
+    return valid_tokens
 
-# Получение данных
-user_info = get_user_info(usernames)
+bearer_list = get_bearer_from_json()
+valid_tokens = check_bearer_tokens(bearer_list)
 
-# Преобразование в DataFrame
-import pandas as pd
-df = pd.DataFrame(user_info)
-print(df)
+if valid_tokens:
+    print("Valid tokens found:")
+    for token in valid_tokens:
+        print(token)
+else:
+    print("No valid tokens found.")

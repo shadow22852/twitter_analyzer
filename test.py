@@ -21,7 +21,7 @@ def get_bearer_from_json():
 
 bearer_list = get_bearer_from_json()
 
-for x in len(bearer_list):
+for x in range(len(bearer_list)):
     bearer_token = str(bearer_list[x])
 
     # Аутентификация
